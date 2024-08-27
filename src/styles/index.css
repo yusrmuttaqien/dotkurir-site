@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    scrollbar-color: theme('colors.white/10') transparent;
+    scrollbar-width: thin;
+  }
+
+  .no-scrollbar {
+    @apply !scroll-smooth;
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none !important; /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important; /* Safari and Chrome */
+  }
+
+  html {
+    @apply bg-black;
+  }
+
+  body {
+    @apply min-w-[320px] antialiased body text-white;
+  }
+}
