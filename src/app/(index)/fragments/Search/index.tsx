@@ -1,102 +1,179 @@
 'use client';
 
-import { Fragment, type FormEvent } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import useProvincies from '@/hooks/provinces';
+import useCosts from '@/hooks/costs';
+import useCities from '@/hooks/cities';
 import Input from '@/components/Input';
 import Image from '@/components/Image';
 import Button from '@/components/Button';
 import ComboBox from '@/components/ComboBox';
 import Calculate from '@/svg/Calculate';
+import Loading from '@/svg/Loading';
 import classMerge from '@/utils/classMerge';
-import type { SearchProps } from './type';
+import debounce from '@/utils/debounce';
+import type { FormEvent } from 'react';
+import type { SearchProps, FormSubmit } from './type';
 
-const people = [
-  { id: 1, name: 'Durward Reynolds' },
-  { id: 2, name: 'Kenton Towne' },
-  { id: 3, name: 'Therese Wunsch' },
-  { id: 4, name: 'Benedict Kessler' },
-  { id: 5, name: 'Devon Webb' },
-  { id: 6, name: 'Devon Webba' },
-  { id: 7, name: 'Devon Webbb' },
-  { id: 8, name: 'Devon Webbcass nameseses' },
-  { id: 9, name: 'Devon Webbd' },
-  { id: 10, name: 'Devon Webbe' },
-];
-const GROUP_STYLE = 'space-y-7 w-[min(230px,100%)]';
+const GROUP_STYLE = 'space-y-7 w-[min(230px,100%)] flex-shrink-0';
 
 export default function Search(props: SearchProps) {
   const { className, contents } = props;
   const { couriers } = contents;
+  const [originProvince, setOriginProvince] = useState<string | undefined>(undefined);
+  const [destProvince, setDestProvince] = useState<string | undefined>(undefined);
+  const [formData, setFormData] = useState<FormSubmit>(undefined);
+  const [formState, setFormState] = useState<
+    ({ queryGo: boolean } & Partial<FormSubmit>) | undefined
+  >(undefined);
+  const { provinces, isLoading: loadingProv } = useProvincies();
+  const {
+    cities: citOri,
+    isLoading: loadingCitOri,
+    isError: errorCitOri,
+  } = useCities({
+    enabled: !!originProvince,
+    params: `?province=${originProvince}`,
+    key: ['cities', `cities-of-${originProvince}`],
+  });
+  const {
+    cities: citDest,
+    isLoading: loadingCitDest,
+    isError: errorCitDest,
+  } = useCities({
+    enabled: !!destProvince,
+    params: `?province=${destProvince}`,
+    key: ['cities', `cities-of-${destProvince}`],
+  });
+  const { isLoading: loadingCosts, error } = useCosts({
+    enabled: formState?.queryGo,
+    values: formData,
+    key: ['costs', JSON.stringify(formData)],
+    retry: false,
+  });
 
   function _onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const courier = (document.getElementsByName('courier[id]')[0] as HTMLInputElement)?.value;
     const weight = (document.getElementsByName('weight')[0] as HTMLInputElement)?.value;
+    const oriProv = (document.getElementsByName('origin-province[id]')[0] as HTMLInputElement)
+      ?.value;
+    const destProv = (document.getElementsByName('destination-province[id]')[0] as HTMLInputElement)
+      ?.value;
+    const oriCit = (document.getElementsByName('origin-city[id]')[0] as HTMLInputElement)?.value;
+    const destCit = (document.getElementsByName('destination-city[id]')[0] as HTMLInputElement)
+      ?.value;
 
-    // console.log(courier, weight);
+    setFormData({
+      courier,
+      weight: weight || undefined,
+      oriProv,
+      destProv,
+      oriCit,
+      destCit,
+    });
+    setFormState((prev) => ({ ...prev, queryGo: true }));
   }
+  function _clearError(name: string) {
+    const field = name as keyof FormSubmit;
+
+    setFormState((prev) => ({ ...prev, queryGo: false, [field]: undefined }));
+  }
+
+  const debouncedClearError = useCallback(debounce(_clearError, 500), []);
+
+  useEffect(() => {
+    const formState = error as unknown as FormSubmit;
+
+    setFormState((prev) => ({ queryGo: prev?.queryGo || false, ...formState }));
+  }, [error]);
 
   return (
     <form
-      className={classMerge('flex items-center justify-center gap-7', className)}
+      className={classMerge('flex items-center justify-center gap-7 flex-wrap', className)}
       onSubmit={_onSubmit}
     >
       <div className={GROUP_STYLE}>
-        <ComboBox<(typeof people)[0]>
-          label="Provinsi asal"
+        <ComboBox<(typeof provinces)[number]>
+          isDisabled={loadingCosts}
+          isLoading={loadingProv}
+          label="Provinsi asal*"
           placeholder="Wajib diisi"
-          options={people}
-          optionKey={({ current }) => current.name}
-          // onChange={({ value }) => console.log(value)}
           name="origin-province"
+          options={provinces}
+          optionKey={({ current }) => current.id}
+          onChange={({ value }) => {
+            debouncedClearError('oriProv');
+            setOriginProvince(value?.id);
+          }}
+          error={formState?.oriProv}
         >
-          {({ selected }) => selected?.name}
-          {({ current }) => ({ value: current, children: current.name })}
+          {({ selected }) => selected?.province}
+          {({ current }) => ({ value: current, children: current.province })}
         </ComboBox>
-        <ComboBox<(typeof people)[0]>
-          label="Pilih kota asal"
+        <ComboBox<(typeof citOri)[number]>
+          isDisabled={!originProvince || errorCitOri || loadingCosts}
+          isLoading={loadingCitOri}
+          label="Kota asal"
           placeholder="Opsional"
-          options={people}
-          optionKey={({ current }) => current.name}
-          // onChange={({ value }) => console.log(value)}
+          options={citOri}
+          optionKey={({ current }) => current.id}
           name="origin-city"
+          error={errorCitOri ? 'Gagal mengambil daftar kota' : formState?.oriCit}
         >
-          {({ selected }) => selected?.name}
-          {({ current }) => ({ value: current, children: current.name })}
+          {({ selected }) => selected && `${selected?.type} ${selected?.city}`}
+          {({ current }) => ({
+            value: current,
+            children: `${current?.type} ${current?.city}`,
+          })}
         </ComboBox>
       </div>
       <div className={GROUP_STYLE}>
-        <ComboBox<(typeof people)[0]>
-          label="Provinsi tujuan"
+        <ComboBox<(typeof provinces)[number]>
+          isDisabled={loadingCosts}
+          isLoading={loadingProv}
+          label="Provinsi tujuan*"
           placeholder="Wajib diisi"
-          options={people}
-          optionKey={({ current }) => current.name}
-          // onChange={({ value }) => console.log(value)}
+          options={provinces}
+          optionKey={({ current }) => current.id}
           name="destination-province"
+          onChange={({ value }) => {
+            debouncedClearError('destProv');
+            setDestProvince(value?.id);
+          }}
+          error={formState?.destProv}
         >
-          {({ selected }) => selected?.name}
-          {({ current }) => ({ value: current, children: current.name })}
+          {({ selected }) => selected?.province}
+          {({ current }) => ({ value: current, children: current.province })}
         </ComboBox>
-        <ComboBox<(typeof people)[0]>
+        <ComboBox<(typeof citDest)[number]>
+          isDisabled={!destProvince || errorCitDest || loadingCosts}
+          isLoading={loadingCitDest}
           label="Kota tujuan"
           placeholder="Opsional"
-          options={people}
-          optionKey={({ current }) => current.name}
-          // onChange={({ value }) => console.log(value)}
+          options={citDest}
+          optionKey={({ current }) => current.id}
           name="destination-city"
+          error={errorCitDest ? 'Gagal mengambil daftar kota' : formState?.destCit}
         >
-          {({ selected }) => selected?.name}
-          {({ current }) => ({ value: current, children: current.name })}
+          {({ selected }) => selected && `${selected?.type} ${selected?.city}`}
+          {({ current }) => ({
+            value: current,
+            children: `${current?.type} ${current?.city}`,
+          })}
         </ComboBox>
       </div>
       <div className={GROUP_STYLE}>
-        <ComboBox<(typeof couriers)[0]>
-          label="Pilih kurir"
+        <ComboBox<(typeof couriers)[number]>
+          isDisabled={loadingCosts}
+          label="Kurir*"
           placeholder="Wajib diisi"
           options={couriers}
           optionKey={({ current }) => current.name}
-          // onChange={({ value }) => console.log(value)}
           name="courier"
+          onChange={({ name }) => debouncedClearError(name)}
+          error={formState?.courier}
         >
           {({ selected }) => selected?.name}
           {({ current }) => ({
@@ -114,10 +191,19 @@ export default function Search(props: SearchProps) {
             ),
           })}
         </ComboBox>
-        <Input label="Berat paket" suffix="gram" placeholder="Wajib diisi" name="weight" />
+        <Input
+          label="Berat paket*"
+          suffix="gram"
+          placeholder="Wajib diisi"
+          name="weight"
+          isDisabled={loadingCosts}
+          onChange={({ name }) => debouncedClearError(name)}
+          error={formState?.weight}
+        />
       </div>
-      <Button className="justify-center self-stretch" type="submit">
-        Hitung <Calculate className="size-[1em]" />
+      <Button className="justify-center self-stretch" type="submit" isDisabled={loadingCosts}>
+        Hitung{' '}
+        {loadingCosts ? <Loading className="size-[1em]" /> : <Calculate className="size-[1em]" />}
       </Button>
     </form>
   );

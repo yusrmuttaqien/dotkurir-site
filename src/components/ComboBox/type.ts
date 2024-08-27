@@ -10,7 +10,7 @@ export type ComboBoxProps<K> = {
   placeholder: ReactNode;
   options: K[];
   optionKey: (params: { current: K }) => any;
-  onChange?: (params: { value: K | null }) => void;
+  onChange?: (params: { value: K | null; name: string }) => void;
   isDisabled?: boolean;
   isLoading?: boolean;
   error?: string;

@@ -8,6 +8,6 @@ export type InputProps = {
   name?: string;
   error?: string;
   type?: HTMLInputTypeAttribute;
-  onChange?: (value: string) => void;
+  onChange?: (props: { value: string; name: string }) => void;
   label?: string;
 };

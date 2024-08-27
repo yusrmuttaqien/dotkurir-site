@@ -9,7 +9,7 @@ export default function Input(props: InputProps) {
   const { prefix, suffix, placeholder, isDisabled, name, error, type, onChange, label } = props;
 
   function _onChange(e: ChangeEvent<HTMLInputElement>) {
-    onChange?.(e.target.value);
+    onChange?.({ value: e.target.value, name: name || '' });
   }
 
   return (
@@ -18,6 +18,7 @@ export default function Input(props: InputProps) {
       className={classMerge(
         'flex items-center w-[min(230px,100%)] bg-white/30 text-white rounded-md',
         'border border-white/15 relative focus-within:bg-white/40 hover:bg-white/40',
+        'transition-colors ease-in-out',
         isDisabled && 'opacity-55 pointer-events-none',
         error && !isDisabled && 'border-red-500'
       )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import Loading from '@/svg/Loading';
 import ChevronX from '@/svg/ChevronX';
@@ -25,8 +25,12 @@ export default function ComboBox<K>(props: ComboBoxProps<K>) {
 
   function _onChange(value: K | null) {
     setSelected(value);
-    onChange?.({ value });
+    onChange?.({ value, name: name || '' });
   }
+
+  useEffect(() => {
+    setSelected(null);
+  }, [options]);
 
   return (
     <Listbox name={name} value={selected} onChange={_onChange} disabled={isDisabled || isLoading}>
@@ -36,7 +40,7 @@ export default function ComboBox<K>(props: ComboBoxProps<K>) {
           'select-none text-left flex items-center justify-between border border-white/15',
           'hover:bg-white/40 data-[open]:bg-white/40 data-[disabled]:opacity-55 transition-colors',
           'ease-in-out disabled:hover:bg-white/30 group relative gap-4',
-          error && !isDisabled && 'border-red-500',
+          error && 'border-red-500',
           !selected && 'text-white/50'
         )}
       >
@@ -54,7 +58,7 @@ export default function ComboBox<K>(props: ComboBoxProps<K>) {
             'text-white'
           )}
         />
-        {error && !isDisabled && (
+        {error && (
           <p className="absolute left-3 right-3 line-clamp-1 top-[calc(100%+0.1rem)] text-xs text-red-500">
             {error}
           </p>

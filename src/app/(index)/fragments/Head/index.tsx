@@ -1,10 +1,15 @@
+import { QueryClient, HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { provincesFetcher } from '@/hooks/provinces';
+import { citiesFetcher } from '@/hooks/cities';
 import Search from '../Search';
 import Box from '@/svg/Box';
 import type { HeadProps } from './type';
 
-export default function Head(props: HeadProps) {
+export default async function Head(props: HeadProps) {
   const { contents } = props;
   const { search } = contents;
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery(provincesFetcher());
 
   return (
     <section className="mt-[30svh] grid place-content-center">
@@ -15,10 +20,12 @@ export default function Head(props: HeadProps) {
         </span>
         ngkir
       </h1>
-      <p className="text-center trim-nohemi-height text-clamp-[9.6_32_320_1280] -mt-[1em]">
-        Solusi cepat untuk Ongkos Kirim yang tepat!
+      <p className="text-center trim-nohemi-height text-clamp-[14_32_320_1280] -mt-[0.3em] wrapper">
+        <span className="wrapper">Solusi cepat untuk Ongkos Kirim yang tepat!</span>
       </p>
-      <Search className="mt-4" contents={search} />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <Search className="mt-10 wrapper" contents={search} />
+      </HydrationBoundary>
     </section>
   );
 }

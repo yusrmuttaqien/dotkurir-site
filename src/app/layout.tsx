@@ -1,3 +1,4 @@
+import Providers from '@/providers';
 import classMerge from '@/utils/classMerge';
 import { metadata as Metadata, nohemi } from './(index)/constant';
 import type { RootLayoutProps } from './(index)/type';
@@ -10,7 +11,9 @@ export default function RootLayout(props: RootLayoutProps) {
   return (
     <html lang="en" className="!pr-0">
       <body className={classMerge('no-scrollbar', nohemi.variable)}>
-        <main>{children}</main>
+        <Providers>
+          <main>{children}</main>
+        </Providers>
       </body>
     </html>
   );

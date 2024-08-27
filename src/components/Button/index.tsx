@@ -17,8 +17,8 @@ export default function Button(props: ButtonProps) {
       className={classMerge(
         'bg-white/10 py-4 px-6 text-white rounded-md w-[min(230px,100%)] backdrop-blur-3xl',
         'select-none text-left flex items-center justify-between border border-white/15',
-        'hover:bg-white/20 data-[disabled]:opacity-55 transition-colors ease-in-out',
-        'disabled:hover:bg-white/10 gap-4 active:bg-white/10',
+        'hoverable:hover:bg-white/20 data-[disabled]:opacity-55 transition-colors ease-in-out',
+        'disabled:hover:bg-white/10 gap-4 active:bg-white/10 transition-colors ease-in-out',
         className
       )}
       type={type}

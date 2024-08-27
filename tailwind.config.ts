@@ -33,6 +33,16 @@ const config: Config = {
           fontFamily: theme('fontFamily.nohemi'),
           fontSize: clamp({ minValue: 14, maxValue: 16, minViewport: 320, maxViewport: 1280 }),
         },
+        '.wrapper': {
+          paddingInline: '1rem',
+          width: '100%',
+          maxWidth: '68.5rem',
+          marginInline: 'auto',
+          '@media (min-width:1280px)': {
+            paddingInline: '0rem',
+            marginInline: 'auto',
+          },
+        },
       });
       // Trim
       matchUtilities(
