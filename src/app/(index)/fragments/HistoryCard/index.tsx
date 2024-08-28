@@ -65,8 +65,8 @@ export default function HistoryCard(props: HistoryCardProps) {
             dragger: classMerge('flex gap-4 h-full justify-end'),
           }}
         >
-          {expandedCosts.map((cost) => (
-            <Cost content={cost} />
+          {expandedCosts.map((cost, idx) => (
+            <Cost key={`${cost.price}-${idx}`} content={cost} />
           ))}
         </Draggable>
       ) : (
