@@ -115,17 +115,18 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof citOri)[number]>
           isDisabled={!originProvince || errorCitOri || loadingCosts}
           isLoading={loadingCitOri}
-          label="Kota asal"
-          placeholder="Opsional"
+          label="Kota asal*"
+          placeholder="Wajib diisi"
           options={citOri}
           optionKey={({ current }) => current.id}
           name="origin-city"
           error={errorCitOri ? 'Gagal mengambil daftar kota' : formState?.oriCit}
+          onChange={() => debouncedClearError('oriCit')}
         >
-          {({ selected }) => selected && `${selected?.type} ${selected?.city}`}
+          {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
           {({ current }) => ({
             value: current,
-            children: `${current?.type} ${current?.city}`,
+            children: `${current?.city} (${current?.type})`,
           })}
         </ComboBox>
       </div>
@@ -150,17 +151,18 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof citDest)[number]>
           isDisabled={!destProvince || errorCitDest || loadingCosts}
           isLoading={loadingCitDest}
-          label="Kota tujuan"
-          placeholder="Opsional"
+          label="Kota tujuan*"
+          placeholder="Wajib diisi"
           options={citDest}
           optionKey={({ current }) => current.id}
           name="destination-city"
           error={errorCitDest ? 'Gagal mengambil daftar kota' : formState?.destCit}
+          onChange={() => debouncedClearError('destCit')}
         >
-          {({ selected }) => selected && `${selected?.type} ${selected?.city}`}
+          {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
           {({ current }) => ({
             value: current,
-            children: `${current?.type} ${current?.city}`,
+            children: `${current?.city} (${current?.type})`,
           })}
         </ComboBox>
       </div>

@@ -12,13 +12,7 @@ export async function getCosts(values: FormSubmit) {
   body.append('courier', values?.courier || '');
 
   function _formatDay(day: string) {
-    if (day.includes('-')) {
-      return day.replace('-', ' - ');
-    } else if (day.includes(' HARI')) {
-      return day.replace('HARI', '').replace(/ /g, '');
-    } else {
-      return day;
-    }
+    return day.replace('HARI', '').replace(/ /g, '').replace('-', ' - ');
   }
   function _formatCurrency(value: any) {
     const isString = typeof value === 'string' && value !== '0';
@@ -41,9 +35,15 @@ export async function getCosts(values: FormSubmit) {
     .then((res) => res.json())
     .then((data: any) => {
       const { rajaongkir: source } = data;
-      const { results = [], ...sources } = source || {};
-      const courier = results[0].name;
+      const { results = [], origin_details, destination_details, ...sources } = source || {};
+      const courier = { name: results[0].name, code: results[0].code };
+      const { city_name: oriCit, type: oriType } = origin_details;
+      const { city_name: destCit, type: destType } = destination_details;
       const date = Date.now();
+      const route = {
+        from: `${oriType} ${oriCit}`,
+        to: `${destType} ${destCit}`,
+      };
       let costs = [] as CostStructure[];
 
       results.forEach((item: any) =>
@@ -65,7 +65,11 @@ export async function getCosts(values: FormSubmit) {
         costs,
         courier,
         date,
-        key: `${JSON.stringify(costs)}-${courier}`,
+        route,
+        weight: sources.query.weight,
+        key: `${JSON.stringify(costs)}-${courier.code}-${JSON.stringify(route)}-${
+          sources.query.weight
+        }`,
       };
     });
 }

@@ -17,6 +17,7 @@ const config: Config = {
         nohemi: ['var(--font-nohemi)', 'sans-serif'],
       },
       screens: {
+        '740': '740px',
         hoverable: { raw: '(hover: hover)' },
         unhoverable: { raw: '(hover: none)' },
       },

@@ -5,7 +5,17 @@ import type { QueryProviderProps } from './type';
 
 export default function QueryProvider(props: QueryProviderProps) {
   const { children } = props;
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 10 * (60 * 1000), // 10 mins
+            gcTime: 15 * (60 * 1000), // 15 mins
+          },
+        },
+      })
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

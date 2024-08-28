@@ -6,17 +6,19 @@ export type CostStructure = {
   service: string;
   desc: string;
   prices: {
-    price: number;
+    price: string;
     etd: string;
     note: string;
   }[];
 };
 export type DataStructure = {
   costs: CostStructure[] | [];
-  courier: string;
+  courier: { name: string; code: string };
   date: string;
   key: string;
+  route: { from: string; to: string };
   errors: FormSubmit;
+  weight: number;
 } & GenericResponse;
 export type CostsParams = {
   values: FormSubmit;

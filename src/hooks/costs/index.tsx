@@ -17,17 +17,16 @@ export function costsFetcher(params: CostsFetcherParams) {
   }
   function _valueChecks(values: CostsFetcherParams['values']) {
     if (!values) return;
-    const allowedEmpty = ['destCit', 'oriCit'];
     let isError = false;
     let errors = { ...values };
 
     Object.entries(values).forEach(([key, value]) => {
       const typedKey = key as keyof typeof errors;
 
-      if (!value && values && !allowedEmpty.includes(key)) {
+      if (!value && values) {
         isError = true;
         errors[typedKey] = `${key} wajib diisi`;
-      } else if (value && values && !allowedEmpty.includes(key)) {
+      } else if (value && values) {
         const checks = _specialCases(key, value);
         errors[typedKey] = '';
 
@@ -64,13 +63,13 @@ export default function useCosts(props: CostsParams) {
   const { data, ...queries } = useQuery<DataStructure>(costsFetcher(props));
 
   useEffect(() => {
-    const { costs, courier, date, key } = data || {};
+    const { key, ...rest } = data || {};
 
     setSearchHistory((prev) => {
       if (!data) return prev;
       const filterDuplicate = prev.filter((item) => item.key !== key);
 
-      return [{ costs, courier: courier, date, key }, ...filterDuplicate];
+      return [{ key, ...rest }, ...filterDuplicate];
     });
   }, [data]);
 
