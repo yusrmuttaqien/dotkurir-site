@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 import { useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
-import { searchHistory } from '@/app/(index)/store';
-import { getCosts } from '@/app/(actions)/costs';
+import { searchHistory } from '@/app/[lang]/(index)/store';
+import { getCosts } from '@/app/[lang]/(actions)/costs';
 import type { DataStructure, CostsParams, CostsFetcherParams } from './type';
 
 export function costsFetcher(params: CostsFetcherParams) {
-  const { key = 'costs', values, ...rest } = params || {};
+  const { key = 'costs', values, contents, ...rest } = params || {};
+  const { validation, labels } = contents;
   const isKeyArray = Array.isArray(key) ? [...key] : [key];
 
   async function _verify(values: CostsFetcherParams['values']) {
@@ -22,10 +23,11 @@ export function costsFetcher(params: CostsFetcherParams) {
 
     Object.entries(values).forEach(([key, value]) => {
       const typedKey = key as keyof typeof errors;
+      const lTypedKey = key as keyof typeof labels;
 
       if (!value && values) {
         isError = true;
-        errors[typedKey] = `${key} wajib diisi`;
+        errors[typedKey] = `${labels[lTypedKey]} ${validation.required}`;
       } else if (value && values) {
         const checks = _specialCases(key, value);
         errors[typedKey] = '';
@@ -45,8 +47,9 @@ export function costsFetcher(params: CostsFetcherParams) {
     switch (key) {
       case 'weight':
         const isNumber = Number.isNaN(parseInt(value, 10));
+        const lTypedKey = key as keyof typeof labels;
 
-        return isNumber ? `${key} harus berupa angka` : null;
+        return isNumber ? `${labels[lTypedKey]} ${validation.mustNumber}` : null;
       default:
         return null;
     }

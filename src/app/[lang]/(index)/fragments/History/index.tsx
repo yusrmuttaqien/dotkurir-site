@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
-import { searchHistory } from '@/app/(index)/store';
+import { searchHistory } from '@/app/[lang]/(index)/store';
 import HistoryCard from '../HistoryCard';
 import classMerge from '@/utils/classMerge';
 import { VARIANTS } from './constant';

@@ -1,0 +1,27 @@
+{
+  "head": {
+    "by": "Oleh",
+    "source_code": "Kode sumber",
+    "tagline": "Solusi cepat untuk ongkos kirim yang tepat"
+  },
+  "search": {
+    "labels": {
+      "oriProv": "Provnsi asal",
+      "destProv": "Provinsi tujuan",
+      "oriCit": "Kota asal",
+      "destCit": "Kota tujuan",
+      "weight": "Berat barang",
+      "courier": "Kurir"
+    },
+    "validation": {
+      "failFetch": "Gagal mengambil data",
+      "required": "wajib diisi",
+      "mustNumber": "harus berupa angka"
+    },
+    "required": "Wajib diisi",
+    "count": "Hitung"
+  },
+  "history": {
+    "title": "Riwayat pencarian"
+  }
+}

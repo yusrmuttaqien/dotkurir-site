@@ -1,7 +1,7 @@
 'use server';
 
 import type { CostStructure } from '@/hooks/costs/type';
-import type { FormSubmit } from '@/app/(index)/fragments/Search/type';
+import type { FormSubmit } from '@/app/[lang]/(index)/fragments/Search/type';
 
 export async function getCosts(values: FormSubmit) {
   const body = new FormData();

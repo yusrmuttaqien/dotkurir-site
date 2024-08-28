@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getProvinces } from '@/app/(actions)/provinces';
+import { getProvinces } from '@/app/[lang]/(actions)/provinces';
 import type {
   ProvinceStructure,
   DataStructure,

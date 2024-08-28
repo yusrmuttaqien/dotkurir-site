@@ -19,7 +19,7 @@ const GROUP_STYLE = 'space-y-7 w-[min(230px,100%)] flex-shrink-0';
 
 export default function Search(props: SearchProps) {
   const { className, contents } = props;
-  const { couriers } = contents;
+  const { couriers, count, labels, required, validation } = contents;
   const [originProvince, setOriginProvince] = useState<string | undefined>(undefined);
   const [destProvince, setDestProvince] = useState<string | undefined>(undefined);
   const [formData, setFormData] = useState<FormSubmit>(undefined);
@@ -50,6 +50,7 @@ export default function Search(props: SearchProps) {
     values: formData,
     key: ['costs', JSON.stringify(formData)],
     retry: false,
+    contents: contents,
   });
 
   function _onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -98,8 +99,8 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof provinces)[number]>
           isDisabled={loadingCosts}
           isLoading={loadingProv}
-          label="Provinsi asal*"
-          placeholder="Wajib diisi"
+          label={labels.oriProv}
+          placeholder={required}
           name="origin-province"
           options={provinces}
           optionKey={({ current }) => current.id}
@@ -115,12 +116,12 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof citOri)[number]>
           isDisabled={!originProvince || errorCitOri || loadingCosts}
           isLoading={loadingCitOri}
-          label="Kota asal*"
-          placeholder="Wajib diisi"
+          label={labels.oriCit}
+          placeholder={required}
           options={citOri}
           optionKey={({ current }) => current.id}
           name="origin-city"
-          error={errorCitOri ? 'Gagal mengambil daftar kota' : formState?.oriCit}
+          error={errorCitOri ? validation.failFetch : formState?.oriCit}
           onChange={() => debouncedClearError('oriCit')}
         >
           {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
@@ -134,8 +135,8 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof provinces)[number]>
           isDisabled={loadingCosts}
           isLoading={loadingProv}
-          label="Provinsi tujuan*"
-          placeholder="Wajib diisi"
+          label={labels.destProv}
+          placeholder={required}
           options={provinces}
           optionKey={({ current }) => current.id}
           name="destination-province"
@@ -151,12 +152,12 @@ export default function Search(props: SearchProps) {
         <ComboBox<(typeof citDest)[number]>
           isDisabled={!destProvince || errorCitDest || loadingCosts}
           isLoading={loadingCitDest}
-          label="Kota tujuan*"
-          placeholder="Wajib diisi"
+          label={labels.destCit}
+          placeholder={required}
           options={citDest}
           optionKey={({ current }) => current.id}
           name="destination-city"
-          error={errorCitDest ? 'Gagal mengambil daftar kota' : formState?.destCit}
+          error={errorCitDest ? validation.failFetch : formState?.destCit}
           onChange={() => debouncedClearError('destCit')}
         >
           {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
@@ -169,8 +170,8 @@ export default function Search(props: SearchProps) {
       <div className={GROUP_STYLE}>
         <ComboBox<(typeof couriers)[number]>
           isDisabled={loadingCosts}
-          label="Kurir*"
-          placeholder="Wajib diisi"
+          label={labels.courier}
+          placeholder={required}
           options={couriers}
           optionKey={({ current }) => current.name}
           name="courier"
@@ -194,9 +195,9 @@ export default function Search(props: SearchProps) {
           })}
         </ComboBox>
         <Input
-          label="Berat paket*"
+          label={labels.weight}
           suffix="gram"
-          placeholder="Wajib diisi"
+          placeholder={required}
           name="weight"
           isDisabled={loadingCosts}
           onChange={({ name }) => debouncedClearError(name)}
@@ -204,7 +205,7 @@ export default function Search(props: SearchProps) {
         />
       </div>
       <Button className="justify-center self-stretch" type="submit" isDisabled={loadingCosts}>
-        Hitung{' '}
+        {count}{' '}
         {loadingCosts ? <Loading className="size-[1em]" /> : <Calculate className="size-[1em]" />}
       </Button>
     </form>

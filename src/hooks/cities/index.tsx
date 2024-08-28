@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getCities } from '@/app/(actions)/cities';
+import { getCities } from '@/app/[lang]/(actions)/cities';
 import type { CityStructure, DataStructure, CitiesParams, CitiesFetcherParams } from './type';
 
 export function citiesFetcher(params?: CitiesFetcherParams) {

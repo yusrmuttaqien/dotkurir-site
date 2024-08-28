@@ -2,7 +2,7 @@ import Providers from '@/providers';
 import classMerge from '@/utils/classMerge';
 import { metadata as Metadata, nohemi } from './(index)/constant';
 import type { RootLayoutProps } from './(index)/type';
-import '../styles/index.css';
+import '../../styles/index.css';
 
 export const metadata = Metadata;
 export default function RootLayout(props: RootLayoutProps) {

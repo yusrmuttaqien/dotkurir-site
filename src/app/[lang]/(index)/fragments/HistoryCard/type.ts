@@ -1,4 +1,4 @@
-import getContents from '@/app/(index)/contents';
+import getContents from '@/app/[lang]/(index)/contents';
 import type { DataStructure } from '@/hooks/costs/type';
 import type { GenericResponse } from '@/types/data';
 

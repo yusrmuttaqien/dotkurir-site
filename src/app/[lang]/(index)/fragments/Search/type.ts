@@ -1,8 +1,8 @@
-import getContents from '@/app/(index)/contents';
+import getContents from '@/app/[lang]/(index)/contents';
 
 export type SearchProps = {
   className?: string;
-  contents: Awaited<ReturnType<typeof getContents>>['hero']['search'];
+  contents: Awaited<ReturnType<typeof getContents>>['head']['search'];
 };
 export type FormSubmit =
   | {

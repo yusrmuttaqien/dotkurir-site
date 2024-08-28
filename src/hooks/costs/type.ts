@@ -1,5 +1,6 @@
+import getContents from '@/app/[lang]/(index)/contents';
 import type { UseQueryOptions } from '@tanstack/react-query';
-import type { FormSubmit } from '@/app/(index)/fragments/Search/type';
+import type { FormSubmit } from '@/app/[lang]/(index)/fragments/Search/type';
 import type { GenericResponse } from '@/types/data';
 
 export type CostStructure = {
@@ -23,8 +24,10 @@ export type DataStructure = {
 export type CostsParams = {
   values: FormSubmit;
   key?: string | string[];
+  contents: Awaited<ReturnType<typeof getContents>>['head']['search'];
 } & Partial<UseQueryOptions<DataStructure, Error>>;
 export type CostsFetcherParams = {
   values: FormSubmit;
   key?: string | string[];
+  contents: Awaited<ReturnType<typeof getContents>>['head']['search'];
 } & Partial<UseQueryOptions<DataStructure, Error>>;

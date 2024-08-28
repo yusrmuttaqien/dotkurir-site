@@ -1,0 +1,27 @@
+{
+  "head": {
+    "by": "By",
+    "source_code": "Source code",
+    "tagline": "Quick solution for accurate Shipping Cost!"
+  },
+  "search": {
+    "labels": {
+      "oriProv": "Origin province",
+      "destProv": "Destination province",
+      "oriCit": "Origin city",
+      "destCit": "Destination city",
+      "weight": "Weight",
+      "courier": "Courier"
+    },
+    "validation": {
+      "failFetch": "Failed to fetch data",
+      "required": "is required",
+      "mustNumber": "must be a number"
+    },
+    "required": "Required",
+    "count": "Count"
+  },
+  "history": {
+    "title": "Search history"
+  }
+}
