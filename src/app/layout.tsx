@@ -9,7 +9,7 @@ export default function RootLayout(props: RootLayoutProps) {
   const { children } = props;
 
   return (
-    <html lang="en" className="!pr-0">
+    <html lang="en" className="!pr-0 no-scrollbar">
       <body className={classMerge('no-scrollbar', nohemi.variable)}>
         <Providers>
           <main>{children}</main>

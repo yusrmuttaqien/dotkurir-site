@@ -65,8 +65,9 @@ export default function useCosts(props: CostsParams) {
   useEffect(() => {
     const { key, ...rest } = data || {};
 
+    if (!data) return;
+
     setSearchHistory((prev) => {
-      if (!data) return prev;
       const filterDuplicate = prev.filter((item) => item.key !== key);
 
       return [{ key, ...rest }, ...filterDuplicate];

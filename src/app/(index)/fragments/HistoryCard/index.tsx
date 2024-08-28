@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import Image from '@/components/Image';
 import Draggable from '@/components/Draggable';
 import classMerge from '@/utils/classMerge';
+import { VARIANTS } from './constant';
 import type { HistoryCardProps, CostProps } from './type';
 
 export default function HistoryCard(props: HistoryCardProps) {
@@ -27,6 +28,7 @@ export default function HistoryCard(props: HistoryCardProps) {
 
   return (
     <motion.figure
+      {...VARIANTS}
       layout="position"
       className={classMerge(
         'bg-white/10 py-4 px-4 text-white rounded-md backdrop-blur-3xl flex items-stretch',
