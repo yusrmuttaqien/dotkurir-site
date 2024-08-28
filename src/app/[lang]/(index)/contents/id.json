@@ -22,6 +22,12 @@
     "count": "Hitung"
   },
   "history": {
-    "title": "Riwayat pencarian"
+    "title": "Riwayat pencarian",
+    "noHistory": "Belum ada riwayat pencarian",
+    "card": {
+      "lastCheck": "Terakhir cek",
+      "noServices": "Tidak ada layanan tersedia",
+      "day": "hari"
+    }
   }
 }

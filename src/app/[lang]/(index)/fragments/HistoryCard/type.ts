@@ -4,7 +4,7 @@ import type { GenericResponse } from '@/types/data';
 
 export type HistoryCardProps = {
   className?: string;
-  content: Omit<DataStructure, 'errors' | keyof GenericResponse> &
+  contents: Omit<DataStructure, 'errors' | keyof GenericResponse> &
     Awaited<ReturnType<typeof getContents>>['history']['card'];
 };
 export type CostProps = {
@@ -14,5 +14,6 @@ export type CostProps = {
     price: string;
     etd: string;
     note: string;
+    day: Awaited<ReturnType<typeof getContents>>['history']['card']['day'];
   };
 };

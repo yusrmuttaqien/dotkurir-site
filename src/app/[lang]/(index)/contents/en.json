@@ -22,6 +22,12 @@
     "count": "Count"
   },
   "history": {
-    "title": "Search history"
+    "title": "Search history",
+    "noHistory": "No history yet",
+    "card": {
+      "lastCheck": "Last check",
+      "noServices": "No services available",
+      "day": "day(s)"
+    }
   }
 }

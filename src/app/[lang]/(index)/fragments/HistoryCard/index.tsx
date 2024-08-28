@@ -6,8 +6,9 @@ import { VARIANTS } from './constant';
 import type { HistoryCardProps, CostProps } from './type';
 
 export default function HistoryCard(props: HistoryCardProps) {
-  const { className, content } = props;
-  const { couriers, courier, date, costs, route, key, weight } = content;
+  const { className, contents } = props;
+  const { couriers, courier, date, costs, route, key, weight, lastCheck, noServices, day } =
+    contents;
   const currentCourier = couriers.find((item) => item.id === courier?.code);
 
   if (!currentCourier) return null;
@@ -20,6 +21,7 @@ export default function HistoryCard(props: HistoryCardProps) {
             price: price.price,
             etd: price.etd,
             note: price.note,
+            day,
           }));
 
           return [...a, ...prices];
@@ -52,9 +54,9 @@ export default function HistoryCard(props: HistoryCardProps) {
           </p>
           <p
             className="opacity-50 line-clamp-1"
-            title={`Cek tgl : ${new Date(date).toLocaleDateString()} - ${weight} gram`}
+            title={`${lastCheck} : ${new Date(date).toLocaleDateString()} - ${weight} gram`}
           >
-            Cek tgl : {new Date(date).toLocaleDateString()} - {weight} gram
+            {lastCheck} : {new Date(date).toLocaleDateString()} - {weight} gram
           </p>
         </figcaption>
       </div>
@@ -73,7 +75,7 @@ export default function HistoryCard(props: HistoryCardProps) {
         </Draggable>
       ) : (
         <div className="h-full w-full grid place-content-center my-auto py-4">
-          <p className="opacity-30">Layanan tidak tersedia</p>
+          <p className="opacity-30">{noServices}</p>
         </div>
       )}
     </motion.figure>
@@ -82,7 +84,7 @@ export default function HistoryCard(props: HistoryCardProps) {
 
 function Cost(props: CostProps) {
   const { content } = props;
-  const { service, desc, price, etd, note } = content;
+  const { service, desc, price, etd, note, day } = content;
 
   return (
     <figure
@@ -97,7 +99,9 @@ function Cost(props: CostProps) {
       </div>
       <figcaption className="text-sm">
         <p className="text-yellow">{price}</p>
-        <p>{etd} hari</p>
+        <p>
+          {etd} {day}
+        </p>
         {note && <p>{note}</p>}
       </figcaption>
     </figure>

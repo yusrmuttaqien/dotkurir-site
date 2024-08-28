@@ -12,9 +12,10 @@ const contents = {
 export default async function getContents(locale: Locale) {
   const { couriers } = globalUntranslated;
   const { search, history, head } = await (contents[locale]?.() ?? contents.en());
+  const { card, ...restHistory } = history;
 
   return {
     head: { search: { couriers, ...search }, ...head },
-    history: { card: { couriers }, ...history },
+    history: { card: { couriers, ...card }, ...restHistory },
   };
 }

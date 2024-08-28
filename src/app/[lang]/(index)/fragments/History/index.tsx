@@ -11,21 +11,20 @@ import type { HistoryCardProps } from '../HistoryCard/type';
 
 export default function History(props: HistoryProps) {
   const { className, contents } = props;
-  const { card } = contents;
-  const { couriers } = card;
+  const { card, title, noHistory } = contents;
   const history = useAtomValue(searchHistory);
 
   return (
     <motion.section layoutRoot className={classMerge('wrapper space-y-4', className)}>
       <motion.h2 layout="position" className="mb-6 wrapper">
-        Riwayat Pencarian
+        {title}
       </motion.h2>
       <AnimatePresence mode="popLayout">
         {history.length > 0 ? (
           history.map((item) => {
-            const content = item as HistoryCardProps['content'];
+            const content = item as HistoryCardProps['contents'];
 
-            return <HistoryCard key={item.key} content={{ ...content, couriers }} />;
+            return <HistoryCard key={item.key} contents={{ ...content, ...card }} />;
           })
         ) : (
           <motion.div
@@ -33,7 +32,7 @@ export default function History(props: HistoryProps) {
             layout="position"
             className="grid place-content-center h-[9.375rem]"
           >
-            <p className="opacity-30">Belum ada pencarian</p>
+            <p className="opacity-30">{noHistory}</p>
           </motion.div>
         )}
       </AnimatePresence>
