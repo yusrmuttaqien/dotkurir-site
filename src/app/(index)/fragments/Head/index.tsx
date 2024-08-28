@@ -13,6 +13,17 @@ export default async function Head(props: HeadProps) {
 
   return (
     <section className={classMerge('grid place-content-center', className)}>
+      <div className="flex justify-between items-center opacity-55 underline wrapper flex-wrap gap-4">
+        <a target="_blank" href="https://yusrmuttaqien.vercel.app">
+          Oleh Yusril Muttaqien
+        </a>
+        <a target="_blank" href="https://github.com/yusrmuttaqien/dotkurir-site">
+          Sumber kode
+        </a>
+        <a target="_blank" href="https://rajaongkir.com/dokumentasi">
+          API RajaOngkir
+        </a>
+      </div>
       <h1 className="trim-nohemi text-clamp-[40_176_320_1280] font-extrabold text-center tracking-wider">
         Cek{' '}
         <span className="inline-grid place-content-start mr-[.1ch]">
