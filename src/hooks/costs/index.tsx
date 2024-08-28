@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
+import { useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
+import { searchHistory } from '@/app/(index)/store';
 import { getCosts } from '@/app/(actions)/costs';
 import type { DataStructure, CostsParams, CostsFetcherParams } from './type';
 
@@ -57,8 +60,19 @@ export function costsFetcher(params: CostsFetcherParams) {
   };
 }
 export default function useCosts(props: CostsParams) {
+  const setSearchHistory = useSetAtom(searchHistory);
   const { data, ...queries } = useQuery<DataStructure>(costsFetcher(props));
-  const { costs = [] } = data || {};
 
-  return { ...queries, costs };
+  useEffect(() => {
+    const { costs, courier, date, key } = data || {};
+
+    setSearchHistory((prev) => {
+      if (!data) return prev;
+      const filterDuplicate = prev.filter((item) => item.key !== key);
+
+      return [{ costs, courier: courier, date, key }, ...filterDuplicate];
+    });
+  }, [data]);
+
+  return { ...queries, ...data };
 }

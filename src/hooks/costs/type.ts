@@ -15,6 +15,7 @@ export type DataStructure = {
   costs: CostStructure[] | [];
   courier: string;
   date: string;
+  key: string;
   errors: FormSubmit;
 } & GenericResponse;
 export type CostsParams = {

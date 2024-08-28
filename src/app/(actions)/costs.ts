@@ -31,11 +31,11 @@ export async function getCosts(values: FormSubmit) {
     return IDR.format(isString ? +value : isNumber ? value : 0).toString();
   }
 
-  return fetch(process.env.NEXT_PUBLIC_RAJA_ONGKIR_BASE_URL + '/cost', {
+  return fetch(process.env.RAJA_ONGKIR_BASE_URL + '/cost', {
     body,
     method: 'POST',
     headers: {
-      key: process.env.NEXT_PUBLIC_RAJA_ONGKIR_API_KEY,
+      key: process.env.RAJA_ONGKIR_API_KEY,
     },
   })
     .then((res) => res.json())
@@ -65,7 +65,7 @@ export async function getCosts(values: FormSubmit) {
         costs,
         courier,
         date,
-        key: `${JSON.stringify(costs)}-${courier}-${date}`,
+        key: `${JSON.stringify(costs)}-${courier}`,
       };
     });
 }

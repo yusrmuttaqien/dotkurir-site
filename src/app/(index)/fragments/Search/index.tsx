@@ -46,7 +46,7 @@ export default function Search(props: SearchProps) {
     key: ['cities', `cities-of-${destProvince}`],
   });
   const { isLoading: loadingCosts, error } = useCosts({
-    enabled: formState?.queryGo,
+    enabled: !!formState?.queryGo,
     values: formData,
     key: ['costs', JSON.stringify(formData)],
     retry: false,
