@@ -11,7 +11,11 @@ export function provincesFetcher(params?: ProvincesFetcherParams) {
   const { key = 'provincies', params: ps = '', ...rest } = params || {};
 
   // TODO: Try transform on server?
-  function _transform(data: any) {
+  async function _transform(data: any) {
+    if (data?.success === false && data?.error) {
+      throw new Error(data.error);
+    }
+
     const { rajaongkir: source } = data;
     const { results = [], ...sources } = source || {};
     let provinces = [] as ProvinceStructure[];
@@ -27,11 +31,13 @@ export function provincesFetcher(params?: ProvincesFetcherParams) {
     ...rest,
     queryKey: [key],
     queryFn: async () => _transform(await getProvinces(ps)),
+    staleTime: 60 * 60 * 1000,
+    retry: false,
   };
 }
 export default function useProvincies(props?: ProvinciesParams) {
   const { data, ...queries } = useQuery<DataStructure>(provincesFetcher(props));
-  const { provinces = [] } = data || {};
+  const provinces = (data as DataStructure | undefined)?.provinces ?? [];
 
   return { ...queries, provinces };
 }

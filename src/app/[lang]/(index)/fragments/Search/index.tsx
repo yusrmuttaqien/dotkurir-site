@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import useProvincies from '@/hooks/provinces';
 import useCosts from '@/hooks/costs';
 import useCities from '@/hooks/cities';
@@ -11,7 +11,6 @@ import ComboBox from '@/components/ComboBox';
 import Calculate from '@/svg/Calculate';
 import Loading from '@/svg/Loading';
 import classMerge from '@/utils/classMerge';
-import debounce from '@/utils/debounce';
 import type { FormEvent } from 'react';
 import type { SearchProps, FormSubmit } from './type';
 
@@ -23,10 +22,8 @@ export default function Search(props: SearchProps) {
   const [originProvince, setOriginProvince] = useState<string | undefined>(undefined);
   const [destProvince, setDestProvince] = useState<string | undefined>(undefined);
   const [formData, setFormData] = useState<FormSubmit>(undefined);
-  const [formState, setFormState] = useState<
-    ({ queryGo: boolean } & Partial<FormSubmit>) | undefined
-  >(undefined);
-  const { provinces, isLoading: loadingProv } = useProvincies();
+
+  const { provinces, isLoading: loadingProv, isError: errorProv } = useProvincies();
   const {
     cities: citOri,
     isLoading: loadingCitOri,
@@ -45,13 +42,15 @@ export default function Search(props: SearchProps) {
     params: `?province=${destProvince}`,
     key: ['cities', `cities-of-${destProvince}`],
   });
-  const { isLoading: loadingCosts, error } = useCosts({
-    enabled: !!formState?.queryGo,
+  const { isLoading: loadingCosts, isError: errorCosts } = useCosts({
+    enabled: !!formData,
     values: formData,
     key: ['costs', JSON.stringify(formData)],
     retry: false,
     contents: contents,
   });
+
+  const isApiUnavailable = errorProv || errorCitOri || errorCitDest;
 
   function _onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -74,30 +73,28 @@ export default function Search(props: SearchProps) {
       oriCit,
       destCit,
     });
-    setFormState((prev) => ({ ...prev, queryGo: true }));
-  }
-  function _clearError(name: string) {
-    const field = name as keyof FormSubmit;
-
-    setFormState((prev) => ({ ...prev, queryGo: false, [field]: undefined }));
   }
 
-  const debouncedClearError = useCallback(debounce(_clearError, 500), []);
-
-  useEffect(() => {
-    const formState = error as unknown as FormSubmit;
-
-    setFormState((prev) => ({ queryGo: prev?.queryGo || false, ...formState }));
-  }, [error]);
+  const clearField = useCallback(
+    (name: string) => {
+      setFormData((prev) => (prev ? { ...prev, [name]: undefined } : prev));
+    },
+    []
+  );
 
   return (
     <form
       className={classMerge('flex items-center justify-center gap-7 flex-wrap', className)}
       onSubmit={_onSubmit}
     >
+      {isApiUnavailable && (
+        <div className="w-full text-center p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600">{validation.failFetch}</p>
+        </div>
+      )}
       <div className={GROUP_STYLE}>
         <ComboBox<(typeof provinces)[number]>
-          isDisabled={loadingCosts}
+          isDisabled={loadingCosts || !!errorProv}
           isLoading={loadingProv}
           label={labels.oriProv}
           placeholder={required}
@@ -105,24 +102,24 @@ export default function Search(props: SearchProps) {
           options={provinces}
           optionKey={({ current }) => current.id}
           onChange={({ value }) => {
-            debouncedClearError('oriProv');
+            clearField('oriProv');
             setOriginProvince(value?.id);
           }}
-          error={formState?.oriProv}
+          error={errorProv ? validation.failFetch : undefined}
         >
           {({ selected }) => selected?.province}
           {({ current }) => ({ value: current, children: current.province })}
         </ComboBox>
         <ComboBox<(typeof citOri)[number]>
-          isDisabled={!originProvince || errorCitOri || loadingCosts}
+          isDisabled={!originProvince || errorCitOri || loadingCosts || !!errorProv}
           isLoading={loadingCitOri}
           label={labels.oriCit}
           placeholder={required}
           options={citOri}
           optionKey={({ current }) => current.id}
           name="origin-city"
-          error={errorCitOri ? validation.failFetch : formState?.oriCit}
-          onChange={() => debouncedClearError('oriCit')}
+          error={errorCitOri ? validation.failFetch : undefined}
+          onChange={() => clearField('oriCit')}
         >
           {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
           {({ current }) => ({
@@ -133,7 +130,7 @@ export default function Search(props: SearchProps) {
       </div>
       <div className={GROUP_STYLE}>
         <ComboBox<(typeof provinces)[number]>
-          isDisabled={loadingCosts}
+          isDisabled={loadingCosts || !!errorProv}
           isLoading={loadingProv}
           label={labels.destProv}
           placeholder={required}
@@ -141,24 +138,24 @@ export default function Search(props: SearchProps) {
           optionKey={({ current }) => current.id}
           name="destination-province"
           onChange={({ value }) => {
-            debouncedClearError('destProv');
+            clearField('destProv');
             setDestProvince(value?.id);
           }}
-          error={formState?.destProv}
+          error={errorProv ? validation.failFetch : undefined}
         >
           {({ selected }) => selected?.province}
           {({ current }) => ({ value: current, children: current.province })}
         </ComboBox>
         <ComboBox<(typeof citDest)[number]>
-          isDisabled={!destProvince || errorCitDest || loadingCosts}
+          isDisabled={!destProvince || errorCitDest || loadingCosts || !!errorProv}
           isLoading={loadingCitDest}
           label={labels.destCit}
           placeholder={required}
           options={citDest}
           optionKey={({ current }) => current.id}
           name="destination-city"
-          error={errorCitDest ? validation.failFetch : formState?.destCit}
-          onChange={() => debouncedClearError('destCit')}
+          error={errorCitDest ? validation.failFetch : undefined}
+          onChange={() => clearField('destCit')}
         >
           {({ selected }) => selected && `${selected?.city} (${selected?.type})`}
           {({ current }) => ({
@@ -169,14 +166,14 @@ export default function Search(props: SearchProps) {
       </div>
       <div className={GROUP_STYLE}>
         <ComboBox<(typeof couriers)[number]>
-          isDisabled={loadingCosts}
+          isDisabled={loadingCosts || !!errorProv}
           label={labels.courier}
           placeholder={required}
           options={couriers}
           optionKey={({ current }) => current.name}
           name="courier"
-          onChange={({ name }) => debouncedClearError(name)}
-          error={formState?.courier}
+          onChange={({ name }) => clearField(name)}
+          error={undefined}
         >
           {({ selected }) => selected?.name}
           {({ current }) => ({
@@ -199,14 +196,24 @@ export default function Search(props: SearchProps) {
           suffix="gram"
           placeholder={required}
           name="weight"
-          isDisabled={loadingCosts}
-          onChange={({ name }) => debouncedClearError(name)}
-          error={formState?.weight}
+          isDisabled={loadingCosts || !!errorProv}
+          onChange={({ name }) => clearField(name)}
+          error={undefined}
         />
       </div>
-      <Button className="justify-center self-stretch" type="submit" isDisabled={loadingCosts}>
+      <Button
+        className="justify-center self-stretch"
+        type="submit"
+        isDisabled={loadingCosts || !!errorProv}
+      >
         {count}{' '}
-        {loadingCosts ? <Loading className="size-[1em]" /> : <Calculate className="size-[1em]" />}
+        {loadingCosts ? (
+          <Loading className="size-[1em]" />
+        ) : errorCosts ? (
+          <span className="text-xs text-red-500">Ulangi</span>
+        ) : (
+          <Calculate className="size-[1em]" />
+        )}
       </Button>
     </form>
   );

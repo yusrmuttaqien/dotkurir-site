@@ -14,7 +14,14 @@ export function costsFetcher(params: CostsFetcherParams) {
     const { isError, errors } = _valueChecks(values) || {};
 
     if (isError) return Promise.reject(errors);
-    return await getCosts(values);
+    const result = await getCosts(values);
+
+    // If the API returned an error response, re-throw it as a Query error
+    if (result?.success === false && result?.error) {
+      throw new Error(result.error);
+    }
+
+    return result;
   }
   function _valueChecks(values: CostsFetcherParams['values']) {
     if (!values) return;

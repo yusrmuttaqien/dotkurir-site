@@ -6,7 +6,11 @@ export function citiesFetcher(params?: CitiesFetcherParams) {
   const { key = 'cities', params: ps = '', ...rest } = params || {};
   const isKeyArray = Array.isArray(key) ? [...key] : [key];
 
-  function _transform(data: any) {
+  async function _transform(data: any) {
+    if (data?.success === false && data?.error) {
+      throw new Error(data.error);
+    }
+
     const { rajaongkir: source } = data;
     const { results = [], ...sources } = source || {};
     let cities = [] as CityStructure[];
@@ -30,11 +34,13 @@ export function citiesFetcher(params?: CitiesFetcherParams) {
     ...rest,
     queryKey: [...isKeyArray],
     queryFn: async () => _transform(await getCities(ps)),
+    staleTime: 60 * 60 * 1000,
+    retry: false,
   };
 }
 export default function useCities(props?: CitiesParams) {
   const { data, ...queries } = useQuery<DataStructure>(citiesFetcher(props));
-  const { cities = [] } = data || {};
+  const cities = (data as DataStructure | undefined)?.cities ?? [];
 
   return { ...queries, cities };
 }
